@@ -1,10 +1,12 @@
+import javax.swing.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class VerificadorLembretes implements Runnable {
     private Agenda agenda;
-    private int intervaloVerificacao; // Intervalo de verificação em segundos
+    private int intervaloVerificacao;
 
     public VerificadorLembretes(Agenda agenda, int intervaloVerificacao) {
         this.agenda = agenda;
@@ -13,27 +15,37 @@ public class VerificadorLembretes implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            LocalDateTime agora = LocalDateTime.now();
-            // Filtra compromissos com lembretes ativos que estão próximos (dentro de 30
-            // minutos)
-            List<Compromisso> lembretes = agenda.getCompromissos().stream()
-                    .filter(c -> c.isLembrete() &&
-                            c.getDataHora().isAfter(agora) &&
-                            c.getDataHora().isBefore(agora.plusMinutes(30)))
-                    .collect(Collectors.toList());
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                LocalDateTime agora = LocalDateTime.now();
+                List<Compromisso> compromissos = agenda.getCompromissos();
 
-            if (!lembretes.isEmpty()) {
-                System.out.println("\n--- LEMBRETES ATIVOS ---");
-                lembretes.forEach(c -> System.out.println(c.getTitulo() + " - " + c.getDataHora()));
-            }
+                // Verifica e remove compromissos com data passada
+                compromissos.removeIf(c -> c.getDataHora().isBefore(agora));
 
-            try {
-                Thread.sleep(intervaloVerificacao * 1000); // Converte segundos para milissegundos
-            } catch (InterruptedException e) {
-                System.out.println("Verificador de lembretes interrompido.");
-                e.printStackTrace();
+                // Verifica lembretes ativos
+                for (Compromisso compromisso : compromissos) {
+                    if (compromisso.isLembrete() &&
+                            compromisso.getDataHora().isAfter(agora) &&
+                            compromisso.getDataHora().isBefore(agora.plusMinutes(30))) {
+                        exibirNotificacao(compromisso);
+                    }
+                }
             }
-        }
+        }, 0, intervaloVerificacao * 1000); // Converte segundos para milissegundos
+    }
+
+    private void exibirNotificacao(Compromisso compromisso) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Lembrete: " + compromisso.getTitulo() + "\n" +
+                            "Descrição: " + compromisso.getDescricao() + "\n" +
+                            "Data/Hora: " + compromisso.getDataHora(),
+                    "Lembrete de Compromisso",
+                    JOptionPane.INFORMATION_MESSAGE);
+        });
     }
 }

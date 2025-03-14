@@ -14,7 +14,7 @@ public class Main {
         // Inicia o verificador de lembretes em uma thread separada
         VerificadorLembretes verificador = new VerificadorLembretes(agenda, 60); // Verifica a cada 60 segundos
         Thread threadVerificador = new Thread(verificador);
-        threadVerificador.setDaemon(true); // Define como daemon para encerrar quando o programa principal terminar
+        threadVerificador.setDaemon(true);
         threadVerificador.start();
 
         // Adiciona um hook para salvar os compromissos ao fechar o programa
@@ -87,7 +87,7 @@ public class Main {
 
                 case 12:
                     System.out.println("Saindo...");
-                    agenda.salvarCompromissos(); // Salva os compromissos antes de sair
+                    agenda.salvarCompromissos();
                     scanner.close();
                     return;
 
