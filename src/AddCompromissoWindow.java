@@ -34,9 +34,8 @@ public class AddCompromissoWindow extends JFrame {
         JLabel categoriaLabel = new JLabel("Categoria:");
         JTextField categoriaField = new JTextField();
 
-        JLabel lembreteLabel = new JLabel("Lembrete (true/false):");
-        JTextField lembreteField = new JTextField();
-
+        JLabel lembreteLabel = new JLabel("Lembrete:");
+        JComboBox<String> lembreteComboBox = new JComboBox<>(new String[] { "Sim", "Não" });
         JButton addButton = new JButton("Adicionar");
 
         addButton.addActionListener(new ActionListener() {
@@ -47,8 +46,7 @@ public class AddCompromissoWindow extends JFrame {
                 LocalDateTime dataHora = LocalDateTime.parse(dataHoraField.getText(),
                         DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                 String categoria = categoriaField.getText();
-                boolean lembrete = Boolean.parseBoolean(lembreteField.getText());
-
+                boolean lembrete = lembreteComboBox.getSelectedItem().equals("Sim");
                 agenda.adicionarCompromisso(titulo, descricao, dataHora, categoria, lembrete);
                 JOptionPane.showMessageDialog(null, "Compromisso adicionado com sucesso!");
                 dispose();
@@ -64,7 +62,7 @@ public class AddCompromissoWindow extends JFrame {
         panel.add(categoriaLabel);
         panel.add(categoriaField);
         panel.add(lembreteLabel);
-        panel.add(lembreteField);
+        panel.add(lembreteComboBox);
         panel.add(addButton);
 
         add(panel);

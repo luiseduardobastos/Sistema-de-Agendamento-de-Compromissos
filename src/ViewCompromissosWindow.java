@@ -28,25 +28,28 @@ public class ViewCompromissosWindow extends JFrame {
         JButton semanalButton = new JButton("Visualizar Semanal");
         JButton mensalButton = new JButton("Visualizar Mensal");
 
-        JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
-        textArea.setLineWrap(true);
-        JScrollPane scrollPane = new JScrollPane(textArea);
+        JTextPane textPane = new JTextPane();
+        textPane.setContentType("text/html"); // Habilita HTML no JTextPane
+        textPane.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(textPane);
 
         diarioButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LocalDate data = LocalDate.now(); // Data atual
-                textArea.setText(""); // Limpa a área de texto
                 List<Compromisso> compromissosDiarios = agenda.getCompromissos().stream()
                         .filter(c -> c.getDataHora().toLocalDate().equals(data))
                         .toList();
+                StringBuilder htmlContent = new StringBuilder("<html><body><h2>Compromissos para " + data + "</h2>");
                 if (compromissosDiarios.isEmpty()) {
-                    textArea.append("Nenhum compromisso para hoje.\n");
+                    htmlContent.append("<p>Nenhum compromisso para hoje.</p>");
                 } else {
-                    textArea.append("Compromissos para " + data + ":\n");
-                    compromissosDiarios.forEach(c -> textArea.append("→ " + c.toString() + "\n"));
+                    htmlContent.append("<ul>");
+                    compromissosDiarios.forEach(c -> htmlContent.append("<li>").append(c.toString()).append("</li>"));
+                    htmlContent.append("</ul>");
                 }
+                htmlContent.append("</body></html>");
+                textPane.setText(htmlContent.toString());
             }
         });
 
@@ -55,17 +58,21 @@ public class ViewCompromissosWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 LocalDate inicioSemana = LocalDate.now(); // Início da semana (hoje)
                 LocalDate fimSemana = inicioSemana.plusDays(6); // Fim da semana (6 dias após hoje)
-                textArea.setText(""); // Limpa a área de texto
                 List<Compromisso> compromissosSemanais = agenda.getCompromissos().stream()
                         .filter(c -> !c.getDataHora().toLocalDate().isBefore(inicioSemana) &&
                                 !c.getDataHora().toLocalDate().isAfter(fimSemana))
                         .toList();
+                StringBuilder htmlContent = new StringBuilder(
+                        "<html><body><h2>Compromissos de " + inicioSemana + " a " + fimSemana + "</h2>");
                 if (compromissosSemanais.isEmpty()) {
-                    textArea.append("Nenhum compromisso para esta semana.\n");
+                    htmlContent.append("<p>Nenhum compromisso para esta semana.</p>");
                 } else {
-                    textArea.append("Compromissos de " + inicioSemana + " a " + fimSemana + ":\n");
-                    compromissosSemanais.forEach(c -> textArea.append("→ " + c.toString() + "\n"));
+                    htmlContent.append("<ul>");
+                    compromissosSemanais.forEach(c -> htmlContent.append("<li>").append(c.toString()).append("</li>"));
+                    htmlContent.append("</ul>");
                 }
+                htmlContent.append("</body></html>");
+                textPane.setText(htmlContent.toString());
             }
         });
 
@@ -75,16 +82,20 @@ public class ViewCompromissosWindow extends JFrame {
                 LocalDate hoje = LocalDate.now();
                 int mes = hoje.getMonthValue();
                 int ano = hoje.getYear();
-                textArea.setText(""); // Limpa a área de texto
                 List<Compromisso> compromissosMensais = agenda.getCompromissos().stream()
                         .filter(c -> c.getDataHora().getMonthValue() == mes && c.getDataHora().getYear() == ano)
                         .toList();
+                StringBuilder htmlContent = new StringBuilder(
+                        "<html><body><h2>Compromissos para " + mes + "/" + ano + "</h2>");
                 if (compromissosMensais.isEmpty()) {
-                    textArea.append("Nenhum compromisso para este mês.\n");
+                    htmlContent.append("<p>Nenhum compromisso para este mês.</p>");
                 } else {
-                    textArea.append("Compromissos para " + mes + "/" + ano + ":\n");
-                    compromissosMensais.forEach(c -> textArea.append("→ " + c.toString() + "\n"));
+                    htmlContent.append("<ul>");
+                    compromissosMensais.forEach(c -> htmlContent.append("<li>").append(c.toString()).append("</li>"));
+                    htmlContent.append("</ul>");
                 }
+                htmlContent.append("</body></html>");
+                textPane.setText(htmlContent.toString());
             }
         });
 

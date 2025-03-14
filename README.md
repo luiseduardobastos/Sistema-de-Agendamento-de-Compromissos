@@ -6,8 +6,7 @@
 
 O Sistema de Agenda para Marcação de Compromissos tem como objetivo auxiliar usuários
 a organizarem suas atividades diárias, permitindo o agendamento, edição e cancelamento de
-compromissos de forma eficiente e intuitiva. O sistema funcionará como uma agenda em formato de
-calendário, permitindo que os usuários selecionem um dia específico para inserir, visualizar e
+compromissos de forma eficiente e intuitiva. O sistema funcionará como uma agenda, permitindo que os usuários selecionem um dia específico para inserir, visualizar e
 gerenciar compromissos. Assim como em calendários digitais populares, será possível navegar entre
 dias, semanas e meses, além de visualizar rapidamente as informações de cada compromisso
 registrado. O sistema também oferecerá alertas de compromissos próximos, permitindo que o usuário
