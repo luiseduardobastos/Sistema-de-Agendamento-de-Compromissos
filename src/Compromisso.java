@@ -1,11 +1,15 @@
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Compromisso {
+public class Compromisso implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String titulo;
     private String descricao;
     private LocalDateTime dataHora;
     private String categoria;
     private boolean lembrete;
+    private boolean concluido;
 
     public Compromisso(String titulo, String descricao, LocalDateTime dataHora, String categoria, boolean lembrete) {
         this.titulo = titulo;
@@ -13,8 +17,10 @@ public class Compromisso {
         this.dataHora = dataHora;
         this.categoria = categoria;
         this.lembrete = lembrete;
+        this.concluido = false;
     }
 
+    // Getters e Setters
     public String getTitulo() {
         return titulo;
     }
@@ -55,6 +61,14 @@ public class Compromisso {
         this.lembrete = lembrete;
     }
 
+    public boolean isConcluido() {
+        return concluido;
+    }
+
+    public void marcarComoConcluido() {
+        this.concluido = true;
+    }
+
     @Override
     public String toString() {
         return "Compromisso{" +
@@ -63,6 +77,7 @@ public class Compromisso {
                 ", dataHora=" + dataHora +
                 ", categoria='" + categoria + '\'' +
                 ", lembrete=" + lembrete +
+                ", concluido=" + concluido +
                 '}';
     }
 }

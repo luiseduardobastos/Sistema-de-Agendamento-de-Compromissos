@@ -17,19 +17,26 @@ public class Main {
         threadVerificador.setDaemon(true); // Define como daemon para encerrar quando o programa principal terminar
         threadVerificador.start();
 
+        // Adiciona um hook para salvar os compromissos ao fechar o programa
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Salvando compromissos antes de fechar...");
+            agenda.salvarCompromissos(); // Salva os compromissos ao fechar
+        }));
+
         while (true) {
             System.out.println("\nEscolha uma opção:");
             System.out.println("1. Adicionar Compromisso");
             System.out.println("2. Editar Compromisso");
             System.out.println("3. Excluir Compromisso");
-            System.out.println("4. Visualizar Compromissos Diários");
-            System.out.println("5. Visualizar Compromissos Semanais");
-            System.out.println("6. Visualizar Compromissos Mensais");
-            System.out.println("7. Buscar Compromissos por Palavra-Chave");
-            System.out.println("8. Filtrar Compromissos por Categoria");
-            System.out.println("9. Gerar Relatório de Compromissos Passados");
-            System.out.println("10. Gerar Relatório de Compromissos Futuros");
-            System.out.println("11. Sair");
+            System.out.println("4. Marcar Compromisso como Concluído");
+            System.out.println("5. Visualizar Compromissos Diários");
+            System.out.println("6. Visualizar Compromissos Semanais");
+            System.out.println("7. Visualizar Compromissos Mensais");
+            System.out.println("8. Buscar Compromissos por Palavra-Chave");
+            System.out.println("9. Filtrar Compromissos por Categoria");
+            System.out.println("10. Gerar Relatório de Compromissos Passados");
+            System.out.println("11. Gerar Relatório de Compromissos Futuros");
+            System.out.println("12. Sair");
 
             int opcao = lerInteiro(scanner);
 
@@ -47,35 +54,40 @@ public class Main {
                     break;
 
                 case 4:
-                    visualizarCompromissosDiarios(agenda, calendario, scanner);
+                    marcarCompromissoConcluido(agenda, scanner);
                     break;
 
                 case 5:
-                    visualizarCompromissosSemanais(agenda, calendario, scanner);
+                    visualizarCompromissosDiarios(agenda, calendario, scanner);
                     break;
 
                 case 6:
-                    visualizarCompromissosMensais(agenda, calendario, scanner);
+                    visualizarCompromissosSemanais(agenda, calendario, scanner);
                     break;
 
                 case 7:
-                    buscarCompromissosPorPalavraChave(agenda, scanner);
+                    visualizarCompromissosMensais(agenda, calendario, scanner);
                     break;
 
                 case 8:
-                    filtrarCompromissosPorCategoria(agenda, scanner);
+                    buscarCompromissosPorPalavraChave(agenda, scanner);
                     break;
 
                 case 9:
-                    relatorio.gerarRelatorioPassados(agenda.getCompromissos());
+                    filtrarCompromissosPorCategoria(agenda, scanner);
                     break;
 
                 case 10:
-                    relatorio.gerarRelatorioFuturos(agenda.getCompromissos());
+                    relatorio.gerarRelatorioPassados(agenda.getCompromissos());
                     break;
 
                 case 11:
+                    relatorio.gerarRelatorioFuturos(agenda.getCompromissos());
+                    break;
+
+                case 12:
                     System.out.println("Saindo...");
+                    agenda.salvarCompromissos(); // Salva os compromissos antes de sair
                     scanner.close();
                     return;
 
@@ -85,7 +97,7 @@ public class Main {
         }
     }
 
-    // Método para adicionar um compromisso com validação de dados
+    // Método para adicionar um compromisso
     private static void adicionarCompromisso(Agenda agenda, Scanner scanner) {
         System.out.println("Título:");
         String titulo = scanner.nextLine();
@@ -100,12 +112,11 @@ public class Main {
 
         boolean lembrete = lerBoolean(scanner); // Validação de booleano
 
-        Compromisso compromisso = new Compromisso(titulo, descricao, dataHora, categoria, lembrete);
-        agenda.adicionarCompromisso(compromisso);
+        agenda.adicionarCompromisso(titulo, descricao, dataHora, categoria, lembrete);
         System.out.println("Compromisso adicionado com sucesso!");
     }
 
-    // Método para editar um compromisso com validação de dados
+    // Método para editar um compromisso
     private static void editarCompromisso(Agenda agenda, Scanner scanner) {
         System.out.println("Índice do compromisso a editar:");
         int index = lerInteiro(scanner);
@@ -124,16 +135,14 @@ public class Main {
 
             boolean novoLembrete = lerBoolean(scanner); // Validação de booleano
 
-            Compromisso novoCompromisso = new Compromisso(novoTitulo, novaDescricao, novaDataHora, novaCategoria,
-                    novoLembrete);
-            agenda.editarCompromisso(index, novoCompromisso);
+            agenda.editarCompromisso(index, novoTitulo, novaDescricao, novaDataHora, novaCategoria, novoLembrete);
             System.out.println("Compromisso editado com sucesso!");
         } else {
             System.out.println("Índice inválido.");
         }
     }
 
-    // Método para excluir um compromisso com validação de índice
+    // Método para excluir um compromisso
     private static void excluirCompromisso(Agenda agenda, Scanner scanner) {
         System.out.println("Índice do compromisso a excluir:");
         int index = lerInteiro(scanner);
@@ -146,21 +155,21 @@ public class Main {
         }
     }
 
-    // Método para visualizar compromissos diários com validação de data
+    // Método para visualizar compromissos diários
     private static void visualizarCompromissosDiarios(Agenda agenda, Calendario calendario, Scanner scanner) {
         System.out.println("Data (yyyy-MM-dd):");
         LocalDate data = lerData(scanner); // Validação de data
         calendario.exibirDiario(agenda.getCompromissos(), data);
     }
 
-    // Método para visualizar compromissos semanais com validação de data
+    // Método para visualizar compromissos semanais
     private static void visualizarCompromissosSemanais(Agenda agenda, Calendario calendario, Scanner scanner) {
         System.out.println("Data de início da semana (yyyy-MM-dd):");
         LocalDate inicioSemana = lerData(scanner); // Validação de data
         calendario.exibirSemanal(agenda.getCompromissos(), inicioSemana);
     }
 
-    // Método para visualizar compromissos mensais com validação de mês e ano
+    // Método para visualizar compromissos mensais
     private static void visualizarCompromissosMensais(Agenda agenda, Calendario calendario, Scanner scanner) {
         System.out.println("Mês (1-12):");
         int mes = lerInteiroNoIntervalo(scanner, 1, 12); // Validação de mês
@@ -185,16 +194,13 @@ public class Main {
 
     // Método para filtrar compromissos por categoria
     private static void filtrarCompromissosPorCategoria(Agenda agenda, Scanner scanner) {
-        System.out.println("Digite a categoria para filtrar:");
+        System.out.println("Categoria:");
         String categoria = scanner.nextLine();
-
-        List<Compromisso> compromissosFiltrados = agenda.filtrarPorCategoria(categoria);
-
-        if (compromissosFiltrados.isEmpty()) {
+        List<Compromisso> resultados = agenda.filtrarPorCategoria(categoria);
+        if (resultados.isEmpty()) {
             System.out.println("Nenhum compromisso encontrado para a categoria: " + categoria);
         } else {
-            System.out.println("Compromissos na categoria '" + categoria + "':");
-            compromissosFiltrados.forEach(System.out::println);
+            resultados.forEach(System.out::println);
         }
     }
 
@@ -249,6 +255,19 @@ public class Main {
                 return Boolean.parseBoolean(entrada);
             }
             System.out.println("Entrada inválida. Digite 'true' ou 'false'.");
+        }
+    }
+
+    // Método para marcar um compromisso como concluído
+    private static void marcarCompromissoConcluido(Agenda agenda, Scanner scanner) {
+        System.out.println("Índice do compromisso a marcar como concluído:");
+        int index = lerInteiro(scanner);
+
+        if (index >= 0 && index < agenda.getCompromissos().size()) {
+            agenda.marcarCompromissoConcluido(index);
+            System.out.println("Compromisso marcado como concluído!");
+        } else {
+            System.out.println("Índice inválido.");
         }
     }
 }
