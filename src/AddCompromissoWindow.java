@@ -41,15 +41,36 @@ public class AddCompromissoWindow extends JFrame {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String titulo = tituloField.getText();
-                String descricao = descricaoField.getText();
-                LocalDateTime dataHora = LocalDateTime.parse(dataHoraField.getText(),
-                        DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-                String categoria = categoriaField.getText();
-                boolean lembrete = lembreteComboBox.getSelectedItem().equals("Sim");
-                agenda.adicionarCompromisso(titulo, descricao, dataHora, categoria, lembrete);
-                JOptionPane.showMessageDialog(null, "Compromisso adicionado com sucesso!");
-                dispose();
+                try {
+                    String titulo = tituloField.getText();
+                    String descricao = descricaoField.getText();
+                    String dataHoraTexto = dataHoraField.getText();
+                    String categoria = categoriaField.getText();
+                    boolean lembrete = lembreteComboBox.getSelectedItem().equals("Sim");
+
+                    // Valida se os campos obrigatórios estão preenchidos
+                    if (titulo.isEmpty() || descricao.isEmpty() || dataHoraTexto.isEmpty() || categoria.isEmpty()) {
+                        throw new IllegalArgumentException("Todos os campos devem ser preenchidos!");
+                    }
+
+                    // Converte a data/hora para LocalDateTime
+                    LocalDateTime dataHora = LocalDateTime.parse(dataHoraTexto, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+                    // Adiciona o compromisso à agenda
+                    agenda.adicionarCompromisso(titulo, descricao, dataHora, categoria, lembrete);
+
+                    // Exibe mensagem de sucesso
+                    JOptionPane.showMessageDialog(null, "Compromisso adicionado com sucesso!");
+                    dispose(); // Fecha a janela após adicionar o compromisso
+                } catch (IllegalArgumentException ex) {
+                    // Exibe mensagem de erro para campos vazios ou dados inválidos
+                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                } catch (Exception ex) {
+                    // Exibe mensagem de erro genérico para outras exceções
+                    JOptionPane.showMessageDialog(null,
+                            "Ocorreu um erro ao adicionar o compromisso: " + ex.getMessage(), "Erro",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
